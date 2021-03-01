@@ -4,6 +4,8 @@ from ..encoding.encoding import decode_public_key
 from ..database.transactiondb import TransactionModel
 from .Input import Input
 from .output import Output
+from .script import Script
+from .question import Question
 from ..database.unspent_transactiondb import UnspentTransactionModel
 
 
@@ -17,6 +19,7 @@ Transaction Format
         outputs: [<Output>],  // Outputs
         timestamp: str,       // Timestamp
         description: str,     // Details of transaction
+        question: Question,   // Random question
         signature: str,       // signature of hash of all above details
         transaction_id: str,  // hash of all above details
     }
@@ -40,7 +43,7 @@ def verify_script(inp: Input, public_key: str) -> bool:
 class Transaction:
 
     def __init__(self, publickey: str = None, inputs: list = None, outputs: list = None, timestamp: str = None,
-                 transaction_id: str = None, signature: str = None, description: str = None):
+                 transaction_id: str = None, signature: str = None, description: str = None, question: Question = None):
 
         self.publickey = publickey
         self.inputs = inputs if inputs is not None else []
@@ -49,6 +52,7 @@ class Transaction:
         self.transaction_id = transaction_id  # Hash of transaction
         self.signature = signature  # signature of the hash of all details except transaction_id
         self.description = description
+        self.question = question
 
     
     def get_transaction(self, transaction_id: str):
@@ -63,6 +67,10 @@ class Transaction:
         self.transaction_id = transaction_data["transaction_id"]
         self.signature = transaction_data["signature"]
         self.description = transaction_data["description"]
+
+        ##        ADD  QUESTION  IN  TRANSACTION  MODEL      ##
+        self.question = transaction_data["question"]
+
         return self
 
 
@@ -93,7 +101,7 @@ class Transaction:
             Hash of the details of entire transaction
         """
         assert self.outputs is not None and self.timestamp is not None and self.signature is not None \
-               and self.description is not None
+               and self.description is not None and self.question is not None
         document = self.json_data()
         document.pop("transaction_id")
         document_str = str(document)
@@ -137,6 +145,12 @@ class Transaction:
 
     def verify_transaction(self) -> bool:
 
+        sha160 = hashlib.sha1()
+        sha160.update(self.question.question.encode("utf-8"))
+
+        if sha160.hexdigest() != self.question.question_id:
+            return False
+
         for i in self.inputs:
             if not verify_script(inp, self.public_key):
                 return False
@@ -170,6 +184,7 @@ class Transaction:
             "timestamp": self.timestamp,
             "signature": self.signature,
             "transaction_id": self.transaction_id,
+            "question": self.question.json_data()
         }
         return document
 
@@ -182,6 +197,7 @@ class Transaction:
         self.transaction_id = transaction_document['transaction_id']
         self.inputs = [ Input().from_json(doc) for doc in transaction_document['inputs'] ]
         self.outputs = [ Output().from_json(doc) for doc in transaction_document['outputs'] ]
+        self.question = Question().from_json(transaction_document["question"])
 
 
     def __repr__(self):
