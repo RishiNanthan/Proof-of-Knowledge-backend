@@ -8,8 +8,8 @@ Input Format
 
     {
         transaction_id: str,    // Hash of Previous Transaction
-        value: float,           // Value holded by the previous transaction
         index: int,             // previous transaction Output index
+        value: float,           // Value holded by the previous transaction
         script_signature: str,  // Script to unlock previous transaction script
     }
 
