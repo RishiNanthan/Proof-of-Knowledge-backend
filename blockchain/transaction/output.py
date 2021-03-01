@@ -7,6 +7,7 @@ Output Format
     {
         index: int,                    // index of the output array
         value: float,                  // value to be transferred
+        public_key: str,               // value transferred to ID
         script_public_signature: str,  // Locking script
     }
 
@@ -15,16 +16,18 @@ Output Format
 
 class Output:
 
-    def __init__(self, index: int, value: float, script_public_signature: str):
+    def __init__(self, index: int, value: float, script_public_signature: str, public_key: str):
         self.index = index
         self.value = value
         self.script_public_signature = script_public_signature        #  Locking Script
+        self.public_key = public_key
 
 
     def json_data(self):
         data = {
             "index": self.index,
             "value": self.value,
+            "public_key": self.public_key,
             "script_public_signature": self.script_public_signature,
         }
         return data
@@ -33,11 +36,12 @@ class Output:
     def from_json(self, output_document: dict):
         self.index = output_document['index']
         self.value = output_document['value']
+        self.public_key = output_document['public_key']
         self.script_publickey = output_document['script_public_signature']
         
 
     def __str__(self):
-        return f"index: {self.index}, value: {self.value}, script_public_signature: {self.script_public_signature}"
+        return f"index: {self.index}, value: {self.value}, public_key: {self.public_key}, script_public_signature: {self.script_public_signature}"
 
 
 print(output_format)
