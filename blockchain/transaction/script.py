@@ -2,6 +2,22 @@ import hashlib
 from blockchain.encoding.encoding import base58_decode, base58_encode, decode_public_key
 
 
+script_format = """
+
+Script Format
+
+    Example Locking Script (Output's Script):
+        " OP_DUP OP_HASH160 <pub_key_hash> OP_EQUALVERIFY OP_CHECKSIG "
+
+    Example Unlocking Script (Input's Script):
+        " <signature> <pub_key> "
+
+    For unlocking the LOCKING script is concatenated to the UNLOCKING script and verified
+        " <signature> <pub_key> OP_DUP OP_HASH160 <pub_key_hash> OP_EQUALVERIFY OP_CHECKSIG "
+
+"""
+
+
 class Script:
 
     def __init__(self, script: str, transaction_id: str):
@@ -164,3 +180,4 @@ class Script:
         self.stack.append(out_encode)
 
 
+print(script_format)
