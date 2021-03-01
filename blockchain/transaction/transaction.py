@@ -7,6 +7,22 @@ from .output import Output
 from ..database.unspent_transactiondb import UnspentTransactionModel
 
 
+transaction_format = """
+
+Transaction Format
+
+    {
+        public_key: str,      // Public Key of the transaction owner
+        inputs: [<Input>],    // Inputs 
+        outputs: [<Output>],  // Outputs
+        timestamp: str,       // Timestamp
+        description: str,     // Details of transaction
+        signature: str,       // signature of hash of all above details
+        transaction_id: str,  // hash of all above details
+    }
+
+"""
+
 def verify_script(inp: Input) -> bool:
     transaction = Transaction.get_transaction(inp.transaction_id)
     if not transaction.inputs[inp.index].value == inp.value:
@@ -175,3 +191,5 @@ class Transaction:
     def __str__(self):
         return str(self.transaction_id)
 
+
+print(transaction_format)
