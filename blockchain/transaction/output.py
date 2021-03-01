@@ -16,7 +16,7 @@ Output Format
 
 class Output:
 
-    def __init__(self, index: int, value: float, script_public_signature: str, public_key: str):
+    def __init__(self, index: int=None, value: float=None, script_public_signature: str=None, public_key: str=None):
         self.index = index
         self.value = value
         self.script_public_signature = script_public_signature        #  Locking Script

@@ -17,7 +17,7 @@ Input Format
 
 class Input:
     
-    def __init__(self, transaction_id: str, index: int, value: float, script_signature: str):
+    def __init__(self, transaction_id: str=None, index: int=None, value: float=None, script_signature: str=None):
         self.transaction_id = transaction_id
         self.value = value
         self.index = index
