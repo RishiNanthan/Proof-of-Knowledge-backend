@@ -23,9 +23,9 @@ Transaction Format
 
 """
 
-def verify_script(inp: Input) -> bool:
-    transaction = Transaction.get_transaction(inp.transaction_id)
-    if not transaction.inputs[inp.index].value == inp.value:
+def verify_script(inp: Input, public_key: str) -> bool:
+    transaction = Transaction().get_transaction(inp.transaction_id)
+    if not transaction.outputs[inp.index].value == inp.value or public_key != transaction.public_key:
         return False
 
     locking_script = transaction.outputs[inp.index].script_publickey
@@ -138,7 +138,7 @@ class Transaction:
     def verify_transaction(self) -> bool:
 
         for i in self.inputs:
-            if not verify_script(inp):
+            if not verify_script(inp, self.public_key):
                 return False
 
         transaction_id = self.transaction_id
@@ -163,7 +163,7 @@ class Transaction:
 
     def json_data(self) -> dict:
         document = {
-            "publickey": self.publickey,
+            "public_key": self.publickey,
             "inputs": [i.json_data() for i in self.inputs],
             "outputs": [i.json_data() for i in self.outputs],
             "description": self.description,
@@ -175,7 +175,7 @@ class Transaction:
 
 
     def from_json(self, transaction_document: dict):
-        self.publickey = transaction_document['publickey']
+        self.publickey = transaction_document['public_key']
         self.description = transaction_document['description']
         self.timestamp = transaction_document['timestamp']
         self.signature = transaction_document['signature']
