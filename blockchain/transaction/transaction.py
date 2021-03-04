@@ -9,7 +9,7 @@ from .question import Question
 from ..database.unspent_transactiondb import UnspentTransactionModel
 
 
-transaction_format = """
+"""
 
 Transaction Format
 
@@ -207,5 +207,3 @@ class Transaction:
     def __str__(self):
         return str(self.transaction_id)
 
-
-print(transaction_format)

@@ -1,6 +1,6 @@
 
 
-output_format = """
+"""
 
 Output Format
 
@@ -43,5 +43,3 @@ class Output:
     def __str__(self):
         return f"index: {self.index}, value: {self.value}, public_key: {self.public_key}, script_public_signature: {self.script_public_signature}"
 
-
-print(output_format)

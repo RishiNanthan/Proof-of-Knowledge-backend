@@ -2,7 +2,7 @@ import base64
 from .script import Script
 
 
-input_format = """
+"""
 
 Input Format
 
@@ -45,4 +45,3 @@ class Input:
         return f"transaction_id: {self.transaction_id}, index: {self.index}, value: {self.value}, " + \
              f"script_signature: {self.script_signature}"
 
-print(input_format)

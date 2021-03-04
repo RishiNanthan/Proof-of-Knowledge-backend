@@ -2,7 +2,7 @@ import hashlib
 from blockchain.encoding.encoding import base58_decode, base58_encode, decode_public_key
 
 
-script_format = """
+"""
 
 Script Format
 
@@ -179,5 +179,3 @@ class Script:
         out_encode = base58_encode(sha256_hash)
         self.stack.append(out_encode)
 
-
-print(script_format)

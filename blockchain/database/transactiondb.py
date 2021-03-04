@@ -4,33 +4,48 @@ SERVER = "mongodb://localhost:27017"
 DATABASE_NAME = "BlockChain_DB"
 COLLECTION_NAME = "Transaction"
 
-"""
-                TRANSACTION DOCUMENT STRUCTURE
 
-                {
-                    transaction_id: str,
-                    public_key: str,
-                    signature: str,
-                    description: str,
-                    timestamp: str,
-                    inputs: [
-                        {
-                            transaction_id: str,
-                            index: int,
-                            value: float,
-                            script_signature: str,
-                        },
-                        ....
-                    ],
-                    outputs: [
-                        {
-                            index: int,
-                            value: float,
-                            script_publickey: str,
-                        },
-                        ....
-                    ],
-                }
+transaction_format = """
+
+Transaction Format
+
+    {
+        public_key: str,      // Public Key of the transaction owner
+        inputs: [<Input>],    // Inputs 
+        outputs: [<Output>],  // Outputs
+        timestamp: str,       // Timestamp
+        description: str,     // Details of transaction
+        question: Question,   // Random question
+        signature: str,       // signature of hash of all above details
+        transaction_id: str,  // hash of all above details
+    }
+
+Input Format
+
+    {
+        transaction_id: str,    // Hash of Previous Transaction
+        index: int,             // previous transaction Output index
+        value: float,           // Value holded by the previous transaction
+        script_signature: str,  // Script to unlock previous transaction script
+    }
+
+Output Format
+
+    {
+        index: int,                    // index of the output array
+        value: float,                  // value to be transferred
+        public_key: str,               // value transferred to ID
+        script_public_signature: str,  // Locking script
+    }
+
+Question Format
+
+    {
+        question: str,     // random general question
+        question_id: str,  // hash of the question
+        answer_hash: str,  // hash for the ( answer + question_id ) 
+    }
+
 
 """
 

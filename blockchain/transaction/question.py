@@ -1,6 +1,6 @@
 
 
-question_format = """
+"""
 
 Question Format
 
@@ -33,5 +33,3 @@ class Question:
         }
         return document
 
-
-print(question_format)
