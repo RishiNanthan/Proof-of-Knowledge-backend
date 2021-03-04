@@ -1,8 +1,10 @@
 import pymongo
+from .settings import SERVER, DATABASE_NAME
 
-SERVER = "mongodb://localhost:27017"
-DATABASE_NAME = "BlockChain_DB"
+
 COLLECTION_NAME = "Unspent_Transaction"
+
+
 
 """
             UNSPENT TRANSACTION DOCUMENT STRUCTURE
