@@ -6,42 +6,22 @@ COLLECTION_NAME = "Block"
 
 
 """
-                    BLOCK DOCUMENT STRUCTURE
-                    
-                    {
-                        block_id: str,
-                        version: int,
-                        previous_block: str,
-                        timestamp: str,
-                        nonce: int,
-                        transactions: [
-                            {
-                                transaction_id: str,
-                                public_key: str,
-                                signature: str,
-                                description: str,
-                                timestamp: str,
-                                inputs: [
-                                    {
-                                        transaction_id: str,
-                                        index: int,
-                                        value: float,
-                                        script_signature: str,
-                                    },
-                                    ....
-                                ],
-                                outputs: [
-                                    {
-                                        index: int,
-                                        value: float,
-                                        script_publickey: str,
-                                    },
-                                    ....
-                                ],
-                            },
-                            ....
-                        ]
-                    }
+BLOCK DOCUMENT STRUCTURE
+
+    {
+        block_id: str,
+        version: int,
+        previous_block: str,
+        timestamp: str,
+        solved_transactions: [
+            {
+                transaction: <Transaction>,
+                solution: str,                       // Answer for the question posted in the transaction
+            }
+            ....
+        ]
+        reward_transaction: <Transaction>
+    }
 
 """
 

@@ -67,8 +67,6 @@ class Transaction:
         self.transaction_id = transaction_data["transaction_id"]
         self.signature = transaction_data["signature"]
         self.description = transaction_data["description"]
-
-        ##        ADD  QUESTION  IN  TRANSACTION  MODEL      ##
         self.question = transaction_data["question"]
 
         return self
@@ -145,10 +143,10 @@ class Transaction:
 
     def verify_transaction(self) -> bool:
 
-        sha160 = hashlib.sha1()
-        sha160.update(self.question.question.encode("utf-8"))
+        sha2 = hashlib.sha256()
+        sha2.update(self.question.question.encode("utf-8"))
 
-        if sha160.hexdigest() != self.question.question_id:
+        if sha2.hexdigest() != self.question.question_id:
             return False
 
         for i in self.inputs:
