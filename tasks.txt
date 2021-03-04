@@ -1,5 +1,5 @@
 
-1, Add question in transaction model
+1, Check all the hashes if they are encoded in base58 and are decoded properly
 2, change proof of work in block.py to proof of knowledge
 3, make transaction database to remove 1 day older transactions
 4, unspend transactions tracking
