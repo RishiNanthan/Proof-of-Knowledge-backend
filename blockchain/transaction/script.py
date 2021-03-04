@@ -1,7 +1,6 @@
 import hashlib
 from blockchain.encoding.encoding import base58_decode, base58_encode, decode_public_key
 
-
 """
 
 Script Format
@@ -28,10 +27,10 @@ class Script:
     def verify_script(self) -> bool:
         script_operations = self.script.split()
         script_operations = [i.strip() for i in script_operations if i.strip() != ""]
-        
+
         try:
             for operation in script_operations:
-                
+
                 if operation == "OP_DUP":
                     # Duplicate the topmost of stack
                     self.stack.append(self.stack[-1])
@@ -79,10 +78,9 @@ class Script:
             print(e)
             return False
 
-        if len(self.stack) == 1 and self.stack[0] == True:
+        if len(self.stack) == 1 and self.stack[0] is True:
             return True
         return False
-
 
     def op_ripemd160(self):
         val = self.stack.pop(-1)
@@ -94,23 +92,21 @@ class Script:
         ripemd160.update(val_decoded)
         ripemd_hash = ripemd160.hexdigest()
 
-        out_decode = base58_encode(ripemd_hash)        
+        out_decode = base58_encode(ripemd_hash)
         self.stack.append(out_decode)
-
 
     def op_sha256(self):
         val = self.stack.pop(-1)
 
         val = base58_decode(val)
         val_decoded = bytes.fromhex(val)
-        
+
         sha256 = hashlib.sha256()
         sha256.update(val_decoded)
         sha256_hash = sha256.hexdigest()
 
-        out_decode = base58_encode(sha256_hash)        
+        out_decode = base58_encode(sha256_hash)
         self.stack.append(out_decode)
-
 
     def op_hash160(self):
         """
@@ -120,7 +116,7 @@ class Script:
 
         val = base58_decode(val)
         val_decoded = bytes.fromhex(val)
-        
+
         sha256 = hashlib.sha256()
         sha256.update(val_decoded)
         sha256_hash = sha256.digest()
@@ -129,9 +125,8 @@ class Script:
         ripemd160.update(sha256_hash)
         ripemd_hash = ripemd160.hexdigest()
 
-        out_decode = base58_encode(ripemd_hash)        
+        out_decode = base58_encode(ripemd_hash)
         self.stack.append(out_decode)
-
 
     def op_equal(self):
         val1 = self.stack.pop(-1)
@@ -140,7 +135,6 @@ class Script:
             self.stack.append(True)
         else:
             self.stack.append(False)
-    
 
     def op_equalverify(self):
         val1 = self.stack.pop(-1)
@@ -148,7 +142,6 @@ class Script:
         if val1 == val2:
             return True
         raise Exception("Script Verification Error")
-
 
     def op_checksig(self):
         public_key = self.stack.pop(-1)
@@ -161,13 +154,12 @@ class Script:
         public_key.verify(signature, transaction_id)
         self.stack.append(True)
 
-
     def op_hash256(self):
         val = self.stack.pop(-1)
 
         val = base58_decode(val)
         val_decoded = bytes.fromhex(val)
-        
+
         sha256 = hashlib.sha256()
         sha256.update(val_decoded)
         sha256_hash = sha256.digest()
@@ -178,4 +170,3 @@ class Script:
 
         out_encode = base58_encode(sha256_hash)
         self.stack.append(out_encode)
-

@@ -1,10 +1,7 @@
 import pymongo
 from .settings import SERVER, DATABASE_NAME
 
-
 COLLECTION_NAME = "Unspent_Transaction"
-
-
 
 """
             UNSPENT TRANSACTION DOCUMENT STRUCTURE
@@ -19,12 +16,10 @@ COLLECTION_NAME = "Unspent_Transaction"
 
 class UnspentTransactionModel:
 
-
     def __init__(self):
         client = pymongo.MongoClient(SERVER)
         db = client.get_database(DATABASE_NAME)
         self.collection = db.get_collection(COLLECTION_NAME)
-
 
     def add_transaction(self, transaction):
         inputs = transaction.inputs
@@ -47,7 +42,6 @@ class UnspentTransactionModel:
         ]
 
         self.collection.insert_many(unspent_documents)
-
 
     def is_spent(self, transaction_input):
         queryset = self.collection.find(

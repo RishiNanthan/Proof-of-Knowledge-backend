@@ -8,7 +8,6 @@ from .script import Script
 from .question import Question
 from ..database.unspent_transactiondb import UnspentTransactionModel
 
-
 """
 
 Transaction Format
@@ -26,6 +25,7 @@ Transaction Format
 
 """
 
+
 def verify_script(inp: Input, public_key: str) -> bool:
     transaction = Transaction().get_transaction(inp.transaction_id)
     if not transaction.outputs[inp.index].value == inp.value or public_key != transaction.public_key:
@@ -42,10 +42,10 @@ def verify_script(inp: Input, public_key: str) -> bool:
 
 class Transaction:
 
-    def __init__(self, publickey: str = None, inputs: list = None, outputs: list = None, timestamp: str = None,
+    def __init__(self, public_key: str = None, inputs: list = None, outputs: list = None, timestamp: str = None,
                  transaction_id: str = None, signature: str = None, description: str = None, question: Question = None):
 
-        self.publickey = publickey
+        self.public_key = public_key
         self.inputs = inputs if inputs is not None else []
         self.outputs = outputs
         self.timestamp = timestamp
@@ -54,13 +54,12 @@ class Transaction:
         self.description = description
         self.question = question
 
-    
     def get_transaction(self, transaction_id: str):
         """
             Fetches transaction from transaction database given transaction id
         """
         transaction_data = TransactionModel().get_transaction(transaction_id)
-        self.publickey = transaction_data["public_key"]
+        self.public_key = transaction_data["public_key"]
         self.inputs = transaction_data["inputs"]
         self.outputs = transaction_data["outputs"]
         self.timestamp = transaction_data["timestamp"]
@@ -71,14 +70,12 @@ class Transaction:
 
         return self
 
-
     @staticmethod
     def add_transaction(transaction) -> bool:
         """
             Inserts transaction to the transaction database
         """
         return TransactionModel().add_transaction(transaction=transaction)
-
 
     def is_unspent(self) -> bool:
         """
@@ -87,19 +84,18 @@ class Transaction:
             Returns:
                 bool    
         """
-        
+
         for inp in self.inputs:
             if UnspentTransactionModel().is_spent(inp):
                 return False
         return True
 
-
     def find_transaction_id(self) -> str:
         """
             Hash of the details of entire transaction
         """
-        assert self.outputs is not None and self.timestamp is not None and self.signature is not None \
-               and self.description is not None and self.question is not None
+        assert self.outputs is not None and self.timestamp is not None and self.signature is not None and \
+               self.description is not None and self.question is not None
         document = self.json_data()
         document.pop("transaction_id")
         document_str = str(document)
@@ -110,7 +106,6 @@ class Transaction:
 
         self.transaction_id = transaction_id
         return transaction_id
-
 
     def get_signing_message_hash(self) -> str:
         document = self.json_data()
@@ -124,9 +119,8 @@ class Transaction:
 
         return message_hash
 
-
     def verify_signature(self) -> bool:
-        pubkey = decode_public_key(self.publickey)
+        pubkey = decode_public_key(self.public_key)
 
         msg = self.get_signing_message_hash()
         msg = bytes.fromhex(msg)
@@ -140,7 +134,6 @@ class Transaction:
 
         return False
 
-
     def verify_transaction(self) -> bool:
 
         sha2 = hashlib.sha256()
@@ -149,7 +142,7 @@ class Transaction:
         if sha2.hexdigest() != self.question.question_id:
             return False
 
-        for i in self.inputs:
+        for inp in self.inputs:
             if not verify_script(inp, self.public_key):
                 return False
 
@@ -158,13 +151,11 @@ class Transaction:
             return False
         return self.verify_signature()
 
-
     def get_total_input_value(self) -> float:
         total_input = 0
         for i in self.inputs:
             total_input += i.value
         return total_input
-
 
     def get_total_output_value(self) -> float:
         total_output = 0
@@ -172,10 +163,9 @@ class Transaction:
             total_output += i.value
         return total_output
 
-
     def json_data(self) -> dict:
         document = {
-            "public_key": self.publickey,
+            "public_key": self.public_key,
             "inputs": [i.json_data() for i in self.inputs],
             "outputs": [i.json_data() for i in self.outputs],
             "description": self.description,
@@ -186,22 +176,20 @@ class Transaction:
         }
         return document
 
-
     def from_json(self, transaction_document: dict):
-        self.publickey = transaction_document['public_key']
+        self.public_key = transaction_document['public_key']
         self.description = transaction_document['description']
         self.timestamp = transaction_document['timestamp']
         self.signature = transaction_document['signature']
         self.transaction_id = transaction_document['transaction_id']
-        self.inputs = [ Input().from_json(doc) for doc in transaction_document['inputs'] ]
-        self.outputs = [ Output().from_json(doc) for doc in transaction_document['outputs'] ]
+        self.inputs = [Input().from_json(doc) for doc in transaction_document['inputs']]
+        self.outputs = [Output().from_json(doc) for doc in transaction_document['outputs']]
         self.question = Question().from_json(transaction_document["question"])
 
+        return self
 
     def __repr__(self):
         return str(self.transaction_id)
 
-
     def __str__(self):
         return str(self.transaction_id)
-

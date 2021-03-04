@@ -15,15 +15,17 @@ Question Format
 
 class Question:
 
-    def __init__(self, question: str=None, question_id: str=None, answer_hash: str=None):
+    def __init__(self, question: str = None, question_id: str = None, answer_hash: str = None):
         self.question = question
         self.question_id = question_id
         self.answer_hash = answer_hash
 
-    def from_json(self, question_document: dict) -> None:
+    def from_json(self, question_document: dict):
         self.question = question_document["question"]
         self.question_id = question_document["question_id"]
         self.answer_hash = question_document["answer_hash"]
+
+        return self
 
     def json_data(self) -> dict:
         document = {

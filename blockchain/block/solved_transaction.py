@@ -4,7 +4,7 @@ from hashlib import sha256
 
 class SolvedTransaction:
 
-    def __init__(self, transaction: Transaction=None, solution: str=None):
+    def __init__(self, transaction: Transaction = None, solution: str = None):
         self.transaction = transaction
         self.solution = solution
 
@@ -26,5 +26,3 @@ class SolvedTransaction:
             "solution": self.solution,
         }
         return document
-
-

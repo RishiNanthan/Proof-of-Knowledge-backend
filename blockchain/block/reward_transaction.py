@@ -4,10 +4,10 @@ from .settings import REWARD_VALUE
 
 class RewardTransaction:
 
-    def __init__(self, publickey: str = None, outputs: list = None, timestamp: str = None, transaction_id: str = None, 
-    signature: str = None, description: str = None):
+    def __init__(self, public_key: str = None, outputs: list = None, timestamp: str = None, transaction_id: str = None,
+                 signature: str = None, description: str = None):
 
-        self.publickey = publickey
+        self.public_key = public_key
         self.inputs = []
         self.outputs = outputs
         self.timestamp = timestamp
@@ -15,7 +15,6 @@ class RewardTransaction:
         self.signature = signature  # signature of the hash of all details except transaction_id
         self.description = description
         self.question = None
-
 
     def verify(self):
         total_value = 0
@@ -25,10 +24,9 @@ class RewardTransaction:
             return False
         return True
 
-
     def json_data(self) -> dict:
         document = {
-            "public_key": self.publickey,
+            "public_key": self.public_key,
             "inputs": [],
             "outputs": [i.json_data() for i in self.outputs],
             "description": self.description,
@@ -39,12 +37,10 @@ class RewardTransaction:
         }
         return document
 
-    
     def from_json(self, transaction_document: dict):
-        self.publickey = transaction_document['public_key']
+        self.public_key = transaction_document['public_key']
         self.description = transaction_document['description']
         self.timestamp = transaction_document['timestamp']
         self.signature = transaction_document['signature']
         self.transaction_id = transaction_document['transaction_id']
-        self.outputs = [ Output().from_json(doc) for doc in transaction_document['outputs'] ]
-
+        self.outputs = [Output().from_json(doc) for doc in transaction_document['outputs']]

@@ -83,7 +83,7 @@ class BlockChain:
         return False
         
 
-    def store_block(self, block_data: dict) -> Block:
+    def store_block(self, block_data: dict) -> bool:
         """
             Stores the block to the database. If already found or not valid block, returns False
 
@@ -103,7 +103,7 @@ class BlockChain:
             return False
 
 
-    def store_transaction(self, transaction_data: dict) -> Transaction:
+    def store_transaction(self, transaction_data: dict) -> bool:
         """
             Stores the transaction to the database. If already found or not valid transaction, returns False
 

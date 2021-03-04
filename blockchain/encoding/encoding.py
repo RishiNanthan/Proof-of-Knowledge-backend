@@ -1,8 +1,7 @@
-
 from ecdsa import VerifyingKey as PublicKey, SECP256k1 as curve, SigningKey as PrivateKey
 
-
 base58_string = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
 
 def base58_encode(hex_string: str) -> str:
     global base58_string
@@ -21,9 +20,9 @@ def base58_decode(encoded_string: str) -> str:
     global base58_string
     n = len(encoded_string)
     number = 0
-    for i in range(n-1, -1, -1):
-        number += base58_string.index(encoded_string[i]) * 58 ** (n-i-1)
-    return hex(number)[2: ]
+    for i in range(n - 1, -1, -1):
+        number += base58_string.index(encoded_string[i]) * 58 ** (n - i - 1)
+    return hex(number)[2:]
 
 
 def encode_public_key(public_key: PublicKey) -> str:
@@ -56,4 +55,3 @@ def decode_private_key(private_key_string: str) -> PrivateKey:
     """
     hex_key = bytes.fromhex(base58_decode(private_key_string))
     return PrivateKey.from_string(hex_key, curve=curve)
-

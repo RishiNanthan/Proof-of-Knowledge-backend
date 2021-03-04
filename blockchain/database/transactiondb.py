@@ -1,9 +1,7 @@
 import pymongo
 from .settings import SERVER, DATABASE_NAME
 
-
 COLLECTION_NAME = "Transaction"
-
 
 transaction_format = """
 
@@ -49,6 +47,7 @@ Question Format
 
 """
 
+
 class TransactionModel:
 
     def __init__(self):
@@ -69,4 +68,3 @@ class TransactionModel:
     def get_transaction(self, transaction_id: str):
         transaction = self.collection.find_one({"transaction_id": transaction_id})
         return transaction
-
