@@ -1,7 +1,6 @@
 import hashlib
 from ..encoding import base58
 
-
 """
 
 Question Format
@@ -26,8 +25,7 @@ class Question:
         sha2 = hashlib.sha256()
         sha2.update(self.question.encode("utf-8"))
         q_id = sha2.hexdigest()
-        return base58.encode(q_id) == self.question_id:
-
+        return base58.encode(q_id) == self.question_id
 
     def from_json(self, question_document: dict):
         self.question = question_document["question"]
@@ -43,4 +41,3 @@ class Question:
             "answer_hash": self.answer_hash,
         }
         return document
-

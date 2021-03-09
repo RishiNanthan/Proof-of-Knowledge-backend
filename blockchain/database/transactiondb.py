@@ -56,14 +56,32 @@ class TransactionModel:
         db = client.get_database(DATABASE_NAME)
         self.collection = db.get_collection(COLLECTION_NAME)
 
-    def add_transaction(self, transaction) -> bool:
-        if self.transaction_exists(transaction_id=transaction.transaction_id):
+    def add_free_transaction(self, transaction) -> bool:
+        if not self.transaction_exists(transaction_id=transaction.transaction_id):
             document = transaction.json_data()
             if "block_id" not in document.keys():
                 document["block_id"] = None
-            ack = self.collection.insert_one(transaction.json_data())
+            ack = self.collection.insert_one(document)
             return ack.acknowledged
         return False
+
+    def add_chain_transaction(self, transaction, block_id: str) -> bool:
+        free_transaction = self.get_transaction(transaction.transaction_id)
+        if free_transaction is not None and free_transaction['block_id'] is None:
+            ack = self.collection.update_one(
+                {
+                    "transaction_id": transaction.transaction_id,
+                },
+                {
+                    "block_id": block_id,
+                }
+            )
+            return ack.acknowledged
+        else:
+            document = transaction.json_data()
+            document['block_id'] = block_id
+            ack = self.collection.insert_one(document)
+            return ack.acknowledged
 
     def transaction_exists(self, transaction_id: str) -> bool:
         transaction = self.collection.find_one({"transaction_id": transaction_id})

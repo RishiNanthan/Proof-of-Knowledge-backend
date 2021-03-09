@@ -10,6 +10,7 @@ COLLECTION_NAME = "Unspent_Transaction"
                 transaction_id: str,
                 output_index: int,
                 spend_block: str,
+                spend_transaction: str,
             }
 
 """
@@ -22,24 +23,30 @@ class UnspentTransactionModel:
         db = client.get_database(DATABASE_NAME)
         self.collection = db.get_collection(COLLECTION_NAME)
 
-    def add_transaction(self, transaction):
+    def add_chain_transaction(self, transaction, block_id: str) -> bool:
         inputs = transaction.inputs
         outputs = transaction.outputs
         transaction_id = transaction.transaction_id
 
         #  Change this to add block_id where the transaction is stored
         for i in inputs:
-            self.collection.delete_one(
+            self.collection.update_one(
                 {
                     "transaction_id": i.transaction_id,
                     "output_index": i.index,
+                },
+                {
+                    "spend_block": block_id,
+                    "spend_transaction": transaction.transaction_id,
                 }
             )
 
         unspent_documents = [
             {
                 "transaction_id": transaction_id,
-                "output_index": output.index
+                "output_index": output.index,
+                "spend_block": None,
+                "spend_transaction": None,
             } for output in outputs
         ]
 
@@ -51,6 +58,7 @@ class UnspentTransactionModel:
                 "transaction_id": transaction_input.transaction_id,
                 "output_index": transaction_input.index,
                 "spend_block": None,
+                "spend_transaction": None,
             }
         )
         return queryset.count()

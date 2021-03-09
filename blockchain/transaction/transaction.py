@@ -38,7 +38,8 @@ Transaction Format
         - transaction_id: str
 
         - get_transaction(transaction_id: str) -> <Transaction>
-        - add_transaction(transaction: Transaction, free_transaction: bool=True) -> bool (@static)
+        - add_free_transaction(transaction: Transaction) -> bool (@static)
+        - add_chain_transaction(transaction: Transaction, block_id: str) -> bool (@static)
         - find_transaction_id() -> str
         - get_total_input_value() -> float
         - get_total_output_value() -> float
@@ -49,7 +50,7 @@ Transaction Format
         - verify_question() -> bool
         - verify_inputs() -> bool
         - verify_outputs() -> bool
-        - verify_timestamp() -> bool
+        - verify_timestamp() -> bool             // to be done
         - verify_transaction_id() -> bool
         - verify_signature() -> bool
         - verify() -> bool
@@ -101,11 +102,18 @@ class Transaction:
         return self
 
     @staticmethod
-    def add_transaction(transaction) -> bool:
+    def add_free_transaction(transaction) -> bool:
         """
-            Inserts transaction to the transaction database
+            Inserts transaction as free transaction in database
         """
-        return TransactionModel().add_transaction(transaction=transaction)
+        return TransactionModel().add_free_transaction(transaction=transaction)
+
+    @staticmethod
+    def add_chain_transaction(transaction, block_id: str) -> bool:
+        """
+            Inserts transaction as chain transaction
+        """
+        return TransactionModel().add_chain_transaction(transaction, block_id)
 
     def is_reward_transaction(self) -> bool:
         if self.__metadata["block_id"] is not None and not len(self.inputs) and self.question is None:
