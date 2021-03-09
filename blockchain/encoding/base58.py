@@ -3,7 +3,7 @@ from ecdsa import VerifyingKey as PublicKey, SECP256k1 as curve, SigningKey as P
 base58_string = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
 
-def base58_encode(hex_string: str) -> str:
+def encode(hex_string: str) -> str:
     global base58_string
     number = int(hex_string, 16)
     encoded_string = ""
@@ -16,7 +16,7 @@ def base58_encode(hex_string: str) -> str:
     return encoded_string
 
 
-def base58_decode(encoded_string: str) -> str:
+def decode(encoded_string: str) -> str:
     global base58_string
     n = len(encoded_string)
     number = 0

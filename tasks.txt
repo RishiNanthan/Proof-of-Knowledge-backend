@@ -3,7 +3,7 @@
 2, change proof of work in block.py to proof of knowledge
 3, make transaction database to remove 1 day older transactions
 4, unspend transactions tracking
-
+5, verify_timestamp in transaction.py
 
 Optional
 1, implement questions DB and check whether questions are repeated

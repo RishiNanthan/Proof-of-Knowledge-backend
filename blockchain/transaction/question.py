@@ -1,3 +1,5 @@
+import hashlib
+from ..encoding import base58
 
 
 """
@@ -19,6 +21,13 @@ class Question:
         self.question = question
         self.question_id = question_id
         self.answer_hash = answer_hash
+
+    def verify(self):
+        sha2 = hashlib.sha256()
+        sha2.update(self.question.encode("utf-8"))
+        q_id = sha2.hexdigest()
+        return base58.encode(q_id) == self.question_id:
+
 
     def from_json(self, question_document: dict):
         self.question = question_document["question"]

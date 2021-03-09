@@ -8,6 +8,7 @@ transaction_format = """
 Transaction Format
 
     {
+        block_id: str,        // Block id if it's stored in chain
         public_key: str,      // Public Key of the transaction owner
         inputs: [<Input>],    // Inputs 
         outputs: [<Output>],  // Outputs
@@ -57,6 +58,9 @@ class TransactionModel:
 
     def add_transaction(self, transaction) -> bool:
         if self.transaction_exists(transaction_id=transaction.transaction_id):
+            document = transaction.json_data()
+            if "block_id" not in document.keys():
+                document["block_id"] = None
             ack = self.collection.insert_one(transaction.json_data())
             return ack.acknowledged
         return False

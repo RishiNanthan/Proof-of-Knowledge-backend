@@ -36,7 +36,7 @@ class Block:
                  reward_transaction: RewardTransaction = None,
                  solved_transactions: list = None, version: int = None):
 
-        self.block_id = block_id
+        self.block_id = block_id                       # base58 of sha256 hash of block
         self.previous_block = previous_block
         self.timestamp = timestamp
         self.solved_transactions = solved_transactions if solved_transactions is not None else []
@@ -58,7 +58,7 @@ class Block:
         hash_string = self.find_hash()
         return base58_encode(hash_string)
 
-    def verify_block(self) -> bool:
+    def verify(self) -> bool:
         if self.find_block_id() != self.block_id:
             return False
 

@@ -14,7 +14,7 @@ class SolvedTransaction:
         sha2.update(hash_message)
         if sha2.hexdigest() != self.transaction.question.answer_hash:
             return False
-        return self.transaction.verify_transaction()
+        return self.transaction.verify()
 
     def from_json(self, document):
         self.transaction = Transaction().from_json(document["transaction"])

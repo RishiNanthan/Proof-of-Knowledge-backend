@@ -56,7 +56,7 @@ class BlockChain:
 
         block = Block()
         block.from_json(block_data)
-        if block.verify_block():
+        if block.verify():
             self.block_pool += [block]
             self.store_block(block_data)
             return True
@@ -76,7 +76,7 @@ class BlockChain:
 
         transaction = Transaction()
         transaction.from_json(transaction_data)
-        if transaction.verify_transaction():
+        if transaction.verify():
             self.transaction_pool += [transaction]
             self.store_transaction(transaction_data)
             return True
@@ -97,7 +97,7 @@ class BlockChain:
 
         block = Block()
         block.from_json(block_data)
-        if block.verify_block():
+        if block.verify():
             return self.block_model.add_block(block)
         else:
             return False
@@ -117,7 +117,7 @@ class BlockChain:
 
         transaction = Transaction()
         transaction.from_json(transaction_data)
-        if transaction.verify_transaction():
+        if transaction.verify():
             return self.transaction_model.add_transaction(transaction)
         else:
             return False
