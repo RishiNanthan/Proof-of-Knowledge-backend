@@ -73,7 +73,9 @@ class TransactionModel:
                     "transaction_id": transaction.transaction_id,
                 },
                 {
-                    "block_id": block_id,
+                    "$set": {
+                        "block_id": block_id,
+                    } 
                 }
             )
             return ack.acknowledged
@@ -88,5 +90,5 @@ class TransactionModel:
         return transaction is not None
 
     def get_transaction(self, transaction_id: str):
-        transaction = self.collection.find_one({"transaction_id": transaction_id})
+        transaction = self.collection.find_one({"transaction_id": transaction_id}, {"_id": 0})
         return transaction

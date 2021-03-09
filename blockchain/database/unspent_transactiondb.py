@@ -28,7 +28,6 @@ class UnspentTransactionModel:
         outputs = transaction.outputs
         transaction_id = transaction.transaction_id
 
-        #  Change this to add block_id where the transaction is stored
         for i in inputs:
             self.collection.update_one(
                 {
@@ -36,8 +35,10 @@ class UnspentTransactionModel:
                     "output_index": i.index,
                 },
                 {
-                    "spend_block": block_id,
-                    "spend_transaction": transaction.transaction_id,
+                    "$set": {
+                        "spend_block": block_id,
+                        "spend_transaction": transaction.transaction_id,
+                    }
                 }
             )
 
