@@ -4,7 +4,6 @@ from .transaction.transaction import Transaction
 from .address import address
 
 # Database Models
-from .database.blockchaindb import BlockChainModel
 from .database.blockdb import BlockModel
 from .database.transactiondb import TransactionModel
 from .database.unspent_transactiondb import UnspentTransactionModel
