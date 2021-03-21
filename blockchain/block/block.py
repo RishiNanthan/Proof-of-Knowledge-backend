@@ -1,9 +1,10 @@
 from ..encoding.encoding import base58_encode, base58_decode
 from ..transaction.transaction import Transaction
 from .solved_transaction import SolvedTransaction
-from .reward_transaction import RewardTransaction
 from hashlib import sha256
 from .settings import VERSION, TRANSACTION_COUNT, REWARD_VALUE
+from ..database.blockdb import BlockModel
+
 
 """
 BLOCK DOCUMENT STRUCTURE
@@ -29,11 +30,37 @@ SOLVED TRANSACTION
 
 """
 
+"""
+
+class Block
+
+    - block_id: str
+    - previous_block: str
+    - solved_transactions: [<SolvedTransaction>]
+    - reward_transaction: <Transaction>
+    - version: int
+    - timestamp: str
+    - miner_public_key: str
+
+    Methods
+    - find_block_id() -> str
+    - get_block(block_id: str) -> Block
+    - add_block(block: Block) -> bool  (@static)
+    - verify() -> bool
+    - verify_solved_transactions() -> bool
+    - verify_timestamp() -> bool
+    - verify_reward_transaction() -> bool
+    - verify_block_id() -> bool
+    - json_data() -> dict
+    - from_json(block_document: dict) -> Block
+
+"""
+
 
 class Block:
 
     def __init__(self, previous_block: str = None, block_id: str = None, timestamp: str = None,
-                 reward_transaction: RewardTransaction = None,
+                 reward_transaction: Transaction = None, miner_public_key: str = None,
                  solved_transactions: list = None, version: int = None):
 
         self.block_id = block_id                       # base58 of sha256 hash of block
@@ -41,7 +68,15 @@ class Block:
         self.timestamp = timestamp
         self.solved_transactions = solved_transactions if solved_transactions is not None else []
         self.version = version
+        self.miner_public_key = miner_public_key
         self.reward_transaction = reward_transaction
+
+    def get_block(self, block_id):
+        block_document = BlockModel().get_block(block_id)
+        return self.from_json(block_document)
+
+    def add_block(self):
+        return BlockModel().add_block(self.json_data())
 
     def find_hash(self) -> str:
         # returns hash without encoding -change if it doesnt feel good
@@ -59,14 +94,25 @@ class Block:
         return base58_encode(hash_string)
 
     def verify(self) -> bool:
-        if self.find_block_id() != self.block_id:
-            return False
+        return self.verify_solved_transactions() and self.verify_reward_transaction() and self.verify_timestamp() and self.verify_block_id()
 
-        for solved_transaction in self.solved_transactions:
-            if not solved_transaction.verify():
+    def verify_solved_transactions(self) -> bool:
+        for transaction in self.solved_transactions:
+            if not transaction.verify():
                 return False
+        return True
 
-        return self.reward_transaction.verify()
+    def verify_reward_transaction(self) -> bool:
+        if len(self.reward_transaction.inputs) == 0 and self.reward_transaction.question is None and self.reward_transaction.get_total_output_value() <= REWARD_VALUE:
+            return True
+        return False
+
+    def verify_block_id(self) -> bool:
+        return self.find_block_id() == self.block_id
+
+    def verify_timestamp(self) -> bool:
+        # To be implemented
+        return True
 
     def json_data(self) -> dict:
         document = {
@@ -74,6 +120,7 @@ class Block:
             "version": self.version,
             "previous_block": self.previous_block,
             "timestamp": self.timestamp,
+            "miner_public_key": self.miner_public_key,
             "solved_transactions": self.solved_transactions,
             "reward_transaction": self.reward_transaction,
         }
@@ -84,9 +131,11 @@ class Block:
         self.version = block_document['version']
         self.previous_block = block_document['previous_block']
         self.timestamp = block_document['timestamp']
+        self.miner_public_key = block_document["miner_public_key"]
 
         self.solved_transactions = [SolvedTransaction().from_json(doc) for doc in block_document['solved_transactions']]
         self.reward_transaction = RewardTransaction().from_json(block_document["reward_transaction"])
+        return self
 
     def __str__(self):
         return str(self.json_data())

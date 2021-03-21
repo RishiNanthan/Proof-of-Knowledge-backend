@@ -35,8 +35,8 @@ class BlockModel:
         query_result = self.collection.find_one({"block_id": block_id}, {"_id": 0})
         return query_result is not None
 
-    def add_block(self, block) -> bool:
-        query_result = self.collection.insert_one(block.json_data())
+    def add_block(self, block_document: dict) -> bool:
+        query_result = self.collection.insert_one(block_document)
         return query_result.acknowledged
 
     def get_block(self, block_id: str) -> dict:

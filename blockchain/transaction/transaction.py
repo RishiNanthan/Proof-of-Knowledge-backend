@@ -38,8 +38,8 @@ Transaction Format
         - transaction_id: str
 
         - get_transaction(transaction_id: str) -> <Transaction>
-        - add_free_transaction(transaction: Transaction) -> bool (@static)
-        - add_chain_transaction(transaction: Transaction, block_id: str) -> bool (@static)
+        - add_free_transaction(transaction: Transaction) -> bool 
+        - add_chain_transaction(transaction: Transaction, block_id: str) -> bool 
         - find_transaction_id() -> str
         - get_total_input_value() -> float
         - get_total_output_value() -> float
@@ -101,19 +101,17 @@ class Transaction:
         self.__metadata['block_id'] = transaction_document['block_id']
         return self
 
-    @staticmethod
-    def add_free_transaction(transaction) -> bool:
+    def add_free_transaction(self) -> bool:
         """
             Inserts transaction as free transaction in database
         """
-        return TransactionModel().add_free_transaction(transaction=transaction)
+        return TransactionModel().add_free_transaction(transaction=self.json_data())
 
-    @staticmethod
-    def add_chain_transaction(transaction, block_id: str) -> bool:
+    def add_chain_transaction(self, block_id: str) -> bool:
         """
             Inserts transaction as chain transaction
         """
-        return TransactionModel().add_chain_transaction(transaction, block_id)
+        return TransactionModel().add_chain_transaction(self.json_data(), block_id)
 
     def is_reward_transaction(self) -> bool:
         if self.__metadata["block_id"] is not None and not len(self.inputs) and self.question is None:
@@ -200,7 +198,8 @@ class Transaction:
         else:
             return False
 
-    def verify_timestamp(self):
+    def verify_timestamp(self) -> bool:
+        # To be implemented
         return True
 
     def verify_transaction_id(self):

@@ -56,21 +56,21 @@ class TransactionModel:
         db = client.get_database(DATABASE_NAME)
         self.collection = db.get_collection(COLLECTION_NAME)
 
-    def add_free_transaction(self, transaction) -> bool:
+    def add_free_transaction(self, transaction_document: dict) -> bool:
         if not self.transaction_exists(transaction_id=transaction.transaction_id):
-            document = transaction.json_data()
+            document = transaction_document
             if "block_id" not in document.keys():
                 document["block_id"] = None
             ack = self.collection.insert_one(document)
             return ack.acknowledged
         return False
 
-    def add_chain_transaction(self, transaction, block_id: str) -> bool:
-        free_transaction = self.get_transaction(transaction.transaction_id)
+    def add_chain_transaction(self, transaction_document: dict, block_id: str) -> bool:
+        free_transaction = self.get_transaction(transaction_document["transaction_id"])
         if free_transaction is not None and free_transaction['block_id'] is None:
             ack = self.collection.update_one(
                 {
-                    "transaction_id": transaction.transaction_id,
+                    "transaction_id": transaction_document["transaction_id"],
                 },
                 {
                     "$set": {
@@ -80,7 +80,7 @@ class TransactionModel:
             )
             return ack.acknowledged
         else:
-            document = transaction.json_data()
+            document = transaction_document
             document['block_id'] = block_id
             ack = self.collection.insert_one(document)
             return ack.acknowledged
@@ -89,6 +89,6 @@ class TransactionModel:
         transaction = self.collection.find_one({"transaction_id": transaction_id})
         return transaction is not None
 
-    def get_transaction(self, transaction_id: str):
+    def get_transaction(self, transaction_id: str) -> dict:
         transaction = self.collection.find_one({"transaction_id": transaction_id}, {"_id": 0})
         return transaction
