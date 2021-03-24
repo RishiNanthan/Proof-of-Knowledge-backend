@@ -9,8 +9,8 @@ COLLECTION_NAME = "Unspent_Transaction"
             {
                 transaction_id: str,
                 output_index: int,
-                spend_block: str,
-                spend_transaction: str,
+                spend_block: str,    // None if not spent yet
+                spend_transaction: str, 
             }
 
 """
@@ -28,19 +28,20 @@ class UnspentTransactionModel:
         outputs = transaction.outputs
         transaction_id = transaction.transaction_id
 
-        for i in inputs:
-            self.collection.update_one(
-                {
-                    "transaction_id": i.transaction_id,
-                    "output_index": i.index,
-                },
-                {
-                    "$set": {
-                        "spend_block": block_id,
-                        "spend_transaction": transaction.transaction_id,
+        if inputs is not None:
+            for i in inputs:
+                self.collection.update_one(
+                    {
+                        "transaction_id": i.transaction_id,
+                        "output_index": i.index,
+                    },
+                    {
+                        "$set": {
+                            "spend_block": block_id,
+                            "spend_transaction": transaction.transaction_id,
+                        }
                     }
-                }
-            )
+                )
 
         unspent_documents = [
             {
@@ -52,6 +53,23 @@ class UnspentTransactionModel:
         ]
 
         self.collection.insert_many(unspent_documents)
+
+    def free_block_transactions(self, block_id: str) -> bool:
+        """
+            Removes all inputs of transactions used in a block from spent transactions list
+        """
+        ack = self.collection.update_many(
+            {
+                'spend_block': block_id
+            },
+            {
+                'spend_block': None,
+                'spend_transaction': None,
+            }
+        )
+
+        return ack.acknowledged
+
 
     def is_unspent(self, transaction_input):
         queryset = self.collection.find_one(

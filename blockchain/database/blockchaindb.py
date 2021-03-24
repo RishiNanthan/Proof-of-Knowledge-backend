@@ -109,7 +109,7 @@ class BlockChainModel:
         return res.acknowledged
     
 
-    def remove_last(self):
+    def remove_last(self) -> bool:
         number = self.get_last_block_number()
         res = self.collection.delete_one({'block_number': number})
 
@@ -119,4 +119,24 @@ class BlockChainModel:
             {'last_block_number': number-1,'last_block_id': self.getby_block_number(number-1) }
         )
         return res.acknowledged and update_config.acknowledged
-        
+
+    def remove_until(self, block_number: int) -> dict:
+        """
+            Removes all blocks from chain until given block_number
+            doesn't remove given block number
+        """
+        removed_list = []
+        number = self.get_last_block_number()
+        while number > block_number:
+            removed_list.append(self.get_last_block_id())
+            self.remove_last()
+            number -= 1
+
+        return removed_list
+
+
+    def block_exists(self, block_id: str) -> bool:
+        block = self.collection.find_one({'block_id': str})
+        if block is not None:
+            return True
+        return False

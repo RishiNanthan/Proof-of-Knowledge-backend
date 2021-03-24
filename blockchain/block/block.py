@@ -51,6 +51,7 @@ class Block
     - verify_timestamp() -> bool
     - verify_reward_transaction() -> bool
     - verify_block_id() -> bool
+    - add_tochain() -> bool
     - json_data() -> dict
     - from_json(block_document: dict) -> Block
 
@@ -113,6 +114,11 @@ class Block:
     def verify_timestamp(self) -> bool:
         # To be implemented
         return True
+
+    def add_tochain(self) -> bool:
+        for solved in self.solved_transactions:
+            solved.add_tochain(self.block_id)
+        return self.reward_transaction.add_chain_transaction(self.block_id)
 
     def json_data(self) -> dict:
         document = {

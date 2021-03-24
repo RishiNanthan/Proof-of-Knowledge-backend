@@ -12,6 +12,28 @@ from .database.unspent_transactiondb import UnspentTransactionModel
 # Other Libraries
 import time
 
+"""
+
+    class Blockchain
+        - blockchain_model: BlockChainModel
+        - block_model: BlockModel
+        - transaction_model: TransactionModel
+        - unspent_transaction_model: UnspentTransactionModel
+        - transaction_pool: [<Transaction>]  // to be verified by human for question validity
+        - block_pool: [<Block>] // to be verified by human for question validity
+
+        Methods
+
+        - generate_keys() -> (ecdsa.PublicKey, ecdsa.PrivateKey)
+        - add_block_pool(block_data: dict) -> bool
+        - add_transaction_pool(transaction_data: dict) -> bool
+        - store_block(block_data: dict) -> bool
+        - store_transaction(transaction_data: dict) -> bool
+        - get_block(block_id: str) -> dict
+        - get_transaction(transaction_id: str) -> dict
+
+
+"""
 
 class BlockChain:
 
@@ -122,8 +144,34 @@ class BlockChain:
         else:
             return False
 
+    def add_blockto_chain(self, block_data: dict) -> bool:
+        block = Block().from_json(block_data)
+        prev_block_id = block.previous_block
+        if self.block_chain_model.block_exists(prev_block_id):
+            if self.block_chain_model.get_last_block_id() == prev_block_id:
+                self.block_chain_model.append(block_id=block.block_id)
+                # Do stuffs like calculate unspend transactions
+                return block.add_tochain()
 
-    def get_block(self, block_id: str):
+            else:
+                prev_block_number = self.block_chain_model.getby_block_id(prev_block_id)
+                cur_block_id = self.block_chain_model.getby_block_number(prev_block_number + 1)
+                cur_block = self.block_model.get_block(cur_block_id)
+
+                # Check Timestamp  To be implemented
+
+                if cur_block.timestamp > block.timestamp:
+                    removed_blocks = self.block_chain_model.remove_until(prev_block_number) # removed block ids
+                    for removed_block in removed_blocks:
+                        self.unspent_transaction_model.free_block_transactions(removed_block)
+                    self.block_chain_model.append(block_id=block.block_id)
+                    
+                    return block.add_tochain()
+
+        return False
+
+
+    def get_blockby_id(self, block_id: str) -> dict:
         """
             Gets the corresponding block from the database. If not found, returns None
 
@@ -131,19 +179,35 @@ class BlockChain:
                 block_id: str // hexadecimal string
 
             Returns:
-                Block
+                Block Dict
 
         """
 
-        block = Block()
         block_data = self.block_model.get_block(block_id)
         if block_data is None:
             return None
-        block.from_json(block_data)
-        return block
+        
+        return block_data
+
+    def get_blockby_number(self, block_number: int) -> dict:
+        """
+            Gets the corresponding block from the database. If not found, returns None
+
+            Parameters:
+                block_id: str // hexadecimal string
+
+            Returns:
+                Block Dict
+
+        """
+        block_id = self.block_chain_model.getby_block_number(block_number)
+        block_data = self.block_model.get_block(block_id)
+        if block_data is None:
+            return None
+        return block_data
 
 
-    def get_transaction(self, transaction_id: str):
+    def get_transaction(self, transaction_id: str) -> dict:
         """
             Gets the corresponding transaction from the database. If not found, returns None
 
@@ -151,17 +215,15 @@ class BlockChain:
                 transaction_id: str // hexadecimal string
 
             Returns:
-                Transaction
+                Transaction Dict
 
         """
 
-        transaction = Transaction
         transaction_data = self.transaction_model.get_transaction(transaction_id)
         if transaction_data is None:
             return None
 
-        transaction.from_json(transaction_data)
-        return transaction
+        return transaction_data
 
 
     def mine_block(self, mining_function=None, transaction_count=10):

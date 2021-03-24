@@ -1,4 +1,5 @@
 from ..transaction.transaction import Transaction
+from ..database.unspent_transactiondb import UnspentTransactionModel
 from hashlib import sha256
 
 
@@ -15,6 +16,10 @@ class SolvedTransaction:
         if sha2.hexdigest() != self.transaction.question.answer_hash:
             return False
         return self.transaction.verify()
+
+    def add_tochain(self, block_id: str) -> bool:
+        return self.transaction.add_chain_transaction(block_id)
+
 
     def from_json(self, document):
         self.transaction = Transaction().from_json(document["transaction"])
