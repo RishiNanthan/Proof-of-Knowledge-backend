@@ -3,6 +3,8 @@ from .block.block import Block
 from .transaction.transaction import Transaction
 from .address import address
 
+from .settings import TRANSACTIONS_PER_BLOCK, VERSION
+
 # Database Models
 from .database.blockchaindb import BlockChainModel
 from .database.blockdb import BlockModel
@@ -21,6 +23,7 @@ import time
         - unspent_transaction_model: UnspentTransactionModel
         - transaction_pool: [<Transaction>]  // to be verified by human for question validity
         - block_pool: [<Block>] // to be verified by human for question validity
+        - solved_transaction_pool: [<SolvedTransaction>]
 
         Methods
 
@@ -51,6 +54,7 @@ class BlockChain:
 
         self.transaction_pool = []
         self.block_pool = []
+        self.solved_transaction_pool = []
 
 
     @staticmethod
@@ -226,39 +230,32 @@ class BlockChain:
         return transaction_data
 
 
-    def mine_block(self, mining_function=None, transaction_count=10):
+    def mine_block(self, reward_transaction_data: dict, miner_public_key: str) -> dict:
         """
             Creates a block using transactions from transaction_pool, returns None incase of failure
 
             Parameters:
-                mining_function: Function  // in case you need more efficient algorithm
-                transaction_count: int     // transactions per block
+                reward_transaction_data: dict
 
             Returns:
                 str    // Block_Hash
   
         """
 
-        new_block = Block()
-        if mining_function is not None:
-            new_block.find_nonce = mining_function
+        if len(self.solved_transaction_pool) >= TRANSACTIONS_PER_BLOCK:
+            new_block = Block()
+            new_block.solved_transactions = self.solved_transaction_pool[: TRANSACTIONS_PER_BLOCK]
+            
+            reward = Transaction().from_json(reward_transaction_data)
+            new_block.reward_transaction = reward
 
-        while len(new_block.transactions) < transaction_count:
-            if not len(self.transaction_pool):
-                print("Waiting 5 seconds for new transactions to create block ... ")
-                time.sleep(5)
-                continue
+            # To be implemented
+            new_block.timestamp = ""
+            new_block.miner_public_key = miner_public_key
+            new_block.version = VERSION
+            new_block.block_id = new_block.find_block_id()
 
-            transaction = self.transaction_pool.pop(0)
-            new_block.transactions += [transaction]
+            self.add_block_pool(new_block.json_data())
+            return new_block.json_data()
 
-        nonce = new_block.find_nonce()
-        block_hash = new_block.find_hash()
-
-        if self.add_block_pool(new_block.json_data()):
-            print(f" Block [{ block_hash }] Created ...")
-            return block_hash
-
-        print(" Block creation Failed ...")
         return None
-        
