@@ -1,5 +1,5 @@
 # Classes
-from .block.block import Block
+from .block.block import Block, SolvedTransaction
 from .transaction.transaction import Transaction
 from .address import address
 
@@ -13,6 +13,8 @@ from .database.unspent_transactiondb import UnspentTransactionModel
 
 # Other Libraries
 import time
+import hashlib
+from .encoding import base58
 
 """
 
@@ -34,6 +36,8 @@ import time
         - store_transaction(transaction_data: dict) -> bool
         - get_block(block_id: str) -> dict
         - get_transaction(transaction_id: str) -> dict
+        - mine_block() -> dict
+        - solve_transaction() -> bool
 
 
 """
@@ -52,9 +56,9 @@ class BlockChain:
         self.transaction_model = TransactionModel()
         self.unspent_transaction_model = UnspentTransactionModel()
 
-        self.transaction_pool = []
-        self.block_pool = []
-        self.solved_transaction_pool = []
+        self.transaction_pool = {}
+        self.block_pool = {}
+        self.solved_transaction_pool = {}
 
 
     @staticmethod
@@ -82,8 +86,12 @@ class BlockChain:
 
         block = Block()
         block.from_json(block_data)
+
+        if block.block_id in self.block_pool.keys():
+            return True
+
         if block.verify():
-            self.block_pool += [block]
+            self.block_pool[block.block_id] = block
             self.store_block(block_data)
             return True
         return False
@@ -102,8 +110,12 @@ class BlockChain:
 
         transaction = Transaction()
         transaction.from_json(transaction_data)
+
+        if transaction.transaction_id in self.transaction_pool.keys():
+            return True
+
         if transaction.verify():
-            self.transaction_pool += [transaction]
+            self.transaction_pool[transaction.transaction_id] = transaction
             self.store_transaction(transaction_data)
             return True
         return False
@@ -228,6 +240,21 @@ class BlockChain:
             return None
 
         return transaction_data
+
+    def solve_transaction(self, transaction_id: str, answer: str) -> bool:
+        transaction = self.transaction_pool[transaction_id]
+        question_id = transaction.question.question_id
+        sha = hashlib.sha256()
+        sha.update((answer+question_id).encode('utf-8'))
+        ans = sha.hexdigest()
+        ans = base58.encode(ans)
+        
+        if ans == transaction.question.answer_hash:
+            self.transaction_pool.pop(transaction.transaction_id)
+            solved_transaction = SolvedTransaction(transaction, answer)
+            self.solved_transaction_pool[transaction.transaction_id] = solved_transaction
+            return True
+        return False
 
 
     def mine_block(self, reward_transaction_data: dict, miner_public_key: str) -> dict:
