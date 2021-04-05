@@ -1,9 +1,5 @@
-
-1, Check all the hashes if they are encoded in base58 and are decoded properly
-2, change proof of work in block.py to proof of knowledge
-3, make transaction database to remove 1 day older transactions
-4, unspend transactions tracking
-5, verify_timestamp in transaction.py
+1, make transaction database to remove 1 day older transactions
+2, verify_timestamp in transaction.py, block.py
 
 Optional
 1, implement questions DB and check whether questions are repeated
