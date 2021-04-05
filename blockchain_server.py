@@ -1,10 +1,12 @@
 
 from blockchain.blockchain import BlockChain
 from blockchain_client import BlockChain_Client
+from blockchain.encoding.base58 import encode, decode_private_key
 
 from flask import Flask, jsonify, request, render_template, url_for, redirect
 
 import random
+import hashlib
 
 LOG = print
 
@@ -109,7 +111,7 @@ def get_block():
 
 @app.route('/get_block_by_number')
 def get_block_by_number():
-    block_number = request.args.get('block_number')
+    block_number = int(request.args.get('block_number'))
     block_id = BLOCKCHAIN.block_chain_model.getby_block_number(block_number)
     if block_id is None:
         return jsonify(ERROR_MSG("NO_SUCH_BLOCK"))
@@ -124,8 +126,10 @@ def get_last_block_number():
 
 @app.route('/create_transaction', methods=["POST"])                     #   To be completed
 def create_transaction():
-    LOG(request.get_json())
-    return jsonify({})
+    transaction_data = request.get_json()
+    if BLOCKCHAIN.add_transaction_pool(transaction_data):
+        return jsonify(ACK_MSG)
+    return jsonify(ERROR_MSG("INVALID_TRANSACTION"))
 
 
 @app.route("/create_address") 
@@ -137,6 +141,34 @@ def create_address():
     }
     # return jsonify(SEND_DATA(data))
     return jsonify(data)                                        # Change this to previous
+
+
+@app.route("/find_hash")
+def find_hash():
+    """
+        /find_hash => gives base58 of sha256 of given document
+    """
+    document = request.get_json()
+    document_data = str(document)
+    sha = hashlib.sha256()
+    sha.update(document_data.encode('utf-8'))
+    hash_str = sha.hexdigest()
+    hash_base58 = encode(hash_str)
+    return jsonify(SEND_DATA({"hash": hash_base58}))
+
+
+@app.route("/get_signature", methods=["POST"])
+def get_signature():
+    private_key = request.values["private_key"]
+    document = request.get_json()
+    
+    document = str(document)
+    private_key = decode_private_key(private_key)
+
+    data = private_key.sign(document.encode('utf-8'))
+    data = encode(data.hex())
+
+    return jsonify(SEND_DATA({"sign": data}))
 
 
 @app.route("/get_client_transactions")                 # To be completed
