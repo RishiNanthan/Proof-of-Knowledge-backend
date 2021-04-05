@@ -37,6 +37,12 @@ def SEND_DATA(data: dict) -> dict:
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+
+@app.errorhandler(500)
+def error_500(err):
+    return jsonify(ERROR_MSG("INVALID_DATA")), 500
+
+
 @app.route('/')
 def index():
     """
@@ -139,8 +145,7 @@ def create_address():
         "public_key": public_key,
         "private_key": private_key,
     }
-    # return jsonify(SEND_DATA(data))
-    return jsonify(data)                                        # Change this to previous
+    return jsonify(SEND_DATA(data))                                     # Change this to previous
 
 
 @app.route("/find_hash")
