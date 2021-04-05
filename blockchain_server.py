@@ -201,6 +201,5 @@ def get_client_transactions():
     return jsonify(data)
 
 
-
 def run_server():
     app.run(IP, PORT, debug=False)
