@@ -1,5 +1,5 @@
 import hashlib
-from blockchain.encoding.encoding import base58_decode, base58_encode, decode_public_key
+from ..encoding.base58 import encode, decode, decode_public_key
 
 """
 
@@ -85,27 +85,27 @@ class Script:
     def op_ripemd160(self):
         val = self.stack.pop(-1)
 
-        val = base58_decode(val)
+        val = decode(val)
         val_decoded = bytes.fromhex(val)
 
         ripemd160 = hashlib.new('ripemd160')
         ripemd160.update(val_decoded)
         ripemd_hash = ripemd160.hexdigest()
 
-        out_decode = base58_encode(ripemd_hash)
+        out_decode = encode(ripemd_hash)
         self.stack.append(out_decode)
 
     def op_sha256(self):
         val = self.stack.pop(-1)
 
-        val = base58_decode(val)
+        val = decode(val)
         val_decoded = bytes.fromhex(val)
 
         sha256 = hashlib.sha256()
         sha256.update(val_decoded)
         sha256_hash = sha256.hexdigest()
 
-        out_decode = base58_encode(sha256_hash)
+        out_decode = encode(sha256_hash)
         self.stack.append(out_decode)
 
     def op_hash160(self):
@@ -114,7 +114,7 @@ class Script:
         """
         val = self.stack.pop(-1)
 
-        val = base58_decode(val)
+        val = decode(val)
         val_decoded = bytes.fromhex(val)
 
         sha256 = hashlib.sha256()
@@ -125,7 +125,7 @@ class Script:
         ripemd160.update(sha256_hash)
         ripemd_hash = ripemd160.hexdigest()
 
-        out_decode = base58_encode(ripemd_hash)
+        out_decode = encode(ripemd_hash)
         self.stack.append(out_decode)
 
     def op_equal(self):
@@ -157,7 +157,7 @@ class Script:
     def op_hash256(self):
         val = self.stack.pop(-1)
 
-        val = base58_decode(val)
+        val = decode(val)
         val_decoded = bytes.fromhex(val)
 
         sha256 = hashlib.sha256()
@@ -168,5 +168,5 @@ class Script:
         sha256.update(sha256_hash)
         sha256_hash = sha256.hexdigest()
 
-        out_encode = base58_encode(sha256_hash)
+        out_encode = encode(sha256_hash)
         self.stack.append(out_encode)

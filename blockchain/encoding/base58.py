@@ -30,14 +30,14 @@ def encode_public_key(public_key: PublicKey) -> str:
         PublicKey -> Base58 String
     """
     hex_key = public_key.to_string().hex()
-    return base58_encode(hex_key)
+    return encode(hex_key)
 
 
 def decode_public_key(public_key_string: str) -> PublicKey:
     """
         Base58 String -> PublicKey
     """
-    hex_key = bytes.fromhex(base58_decode(public_key_string))
+    hex_key = bytes.fromhex(decode(public_key_string))
     return PublicKey.from_string(hex_key, curve=curve)
 
 
@@ -46,12 +46,12 @@ def encode_private_key(private_key: PrivateKey) -> str:
         PublicKey -> Base58 String
     """
     hex_key = private_key.to_string().hex()
-    return base58_encode(hex_key)
+    return encode(hex_key)
 
 
 def decode_private_key(private_key_string: str) -> PrivateKey:
     """
         Base58 String -> Private Key
     """
-    hex_key = bytes.fromhex(base58_decode(private_key_string))
+    hex_key = bytes.fromhex(decode(private_key_string))
     return PrivateKey.from_string(hex_key, curve=curve)

@@ -2,6 +2,9 @@ import requests
 from blockchain.blockchain import BlockChain
 
 
+LOG = print
+
+
 class BlockChain_Client:
 
     def __init__(self, ip: str="127.0.0.1", port: int=8000):
@@ -18,7 +21,7 @@ class BlockChain_Client:
                 return transaction_data
 
         except Exception as e:
-            print(e)
+            LOG(e)
         
         return None
 
@@ -33,32 +36,32 @@ class BlockChain_Client:
                 return block_data
             
         except Exception as e:
-            print(e)
+            LOG(e)
         return None
 
 
     def send_transaction_invite(self, transaction_id: str, connected_nodes: list) -> None:
         for nodes in connected_nodes:
             address = f"http://{ node }/invite_for_transaction"
-            print(f"Sending Transaction invite to { node }")
+            LOG(f"Sending Transaction invite to { node }")
             try:
                 req = requests.get(address, {
                     'transaction_id': transaction_id,
                     'ip_address': f"{ IP }:{ PORT }"
                 })
             except Exception as e:
-                print(e)
+                LOG(e)
                 
 
     def send_block_invite(self, block_id: str, connected_nodes: list) -> None:
         for nodes in connected_nodes:
             address = f"http://{ node }/invite_for_block"
-            print(f"Sending Block invite to { node }")
+            LOG(f"Sending Block invite to { node }")
             try:
                 req = requests.get(address, {
                     'block_id': block_id,
                     'ip_address': f"{ self.ip_address }"
                 })
             except Exception as e:
-                print(e)
+                LOG(e)
 

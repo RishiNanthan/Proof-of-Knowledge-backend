@@ -1,4 +1,4 @@
-from ..encoding.encoding import base58_encode, base58_decode
+from ..encoding.base58 import encode, decode
 from ..transaction.transaction import Transaction
 from .solved_transaction import SolvedTransaction
 from hashlib import sha256
@@ -92,7 +92,7 @@ class Block:
 
     def find_block_id(self) -> str:
         hash_string = self.find_hash()
-        return base58_encode(hash_string)
+        return encode(hash_string)
 
     def verify(self) -> bool:
         return self.verify_solved_transactions() and self.verify_reward_transaction() and self.verify_timestamp() and self.verify_block_id()

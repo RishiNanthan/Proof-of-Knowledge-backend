@@ -1,0 +1,41 @@
+{
+    "block_id": "",
+    "version": 1,
+    "timestamp": "06-04-2021",
+    "solved_transactions": [
+        {
+            "transaction": {
+                "transaction_id": "",
+                "public_key": "",
+                "signature": "",
+                "timestamp": "06-04-2021",
+                "description": "First Transaction",
+                "inputs": [],
+                "outputs": [
+                    {
+                        "index": 0,
+                        "value": 1,
+                        "public_key": "",
+                        "script_public_signature": ""
+                    }
+                ],
+                "question": {
+                    "question": "",
+                    "question_id": "",
+                    "answer_hash": ""
+                }
+            },
+            "solution": ""
+        }
+    ],
+    "reward_transaction": {
+        "transaction_id": "",
+        "public_key": "",
+        "signature": "",
+        "timestamp": "06-04-2021",
+        "description": "First Transaction",
+        "inputs": [],
+        "outputs": [],
+        "question": null
+    }
+}

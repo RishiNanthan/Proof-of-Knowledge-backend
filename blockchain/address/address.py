@@ -1,6 +1,6 @@
 from ecdsa import VerifyingKey as PublicKey, SECP256k1 as curve, SigningKey as PrivateKey
 import ecdsa
-from ..encoding.encoding import encode_private_key, encode_public_key
+from ..encoding.base58 import encode_private_key, encode_public_key
 
 
 def generate_keys() -> tuple:
